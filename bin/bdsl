@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby
+Signal.trap('INT') { exit 1 }
+
+$LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
+
+require 'bdsl/cmd'
+
+BDSL::CMD::Interaction.start(ARGV)

@@ -1,0 +1,1 @@
+gcc  -Wall -Werror=return-type -g3 -O0 -fno-builtin -ffast-math  -static CMakeFiles/nsswitcher.dir/src/nsswitcher.c.o  -o build/nsswitcher -rdynamic 
