@@ -10,17 +10,18 @@ module BDSL
       @baseBuildDir = @pkg.build_dir
       @source_pkg = @pkg.get_source_path
       @buildDir = "#{@pkg.build_dir}/#{@pkg.name}-#{@pkg.version}"
+      @buildBlock = block
 
-      _preBuild
-      instance_eval(&block)
     end
 
     def out
-      pkgOut = "#{@pkg.install_dir}/app.#{@pkg.type}.#{@pkg.name}-#{@pkg.version}"
-      if @pkg.extra_version != ""
-        pkgOut = pkgOut + "-#{@pkg.extra_version}"
-      end
-      pkgOut
+      @pkg.out
+    end
+
+
+    def do_build
+      _preBuild
+      instance_eval(&@buildBlock)
     end
 
     def tool_dir
@@ -41,7 +42,7 @@ module BDSL
     def _preBuild
       puts "_preBuild"
       prepareBuildDir
-      system(@env, "tar -xf #{@source_pkg}")
+      system("tar -xf #{@source_pkg}")
     end
 
     def source_pkg

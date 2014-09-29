@@ -4,6 +4,7 @@ project(nsswitcher)
 SET (CMAKE_C_COMPILER "gcc")
 SET (CMAKE_CXX_FLAGS "-Wall -Werror=return-type -g3 -O0 -fno-builtin -ffast-math")
 SET (CMAKE_C_FLAGS "-Wall -Werror=return-type -g3 -O0 -fno-builtin -ffast-math")
+include_directories("./include")
 
 SET (NSS
     src/nsswitcher.c
@@ -16,3 +17,5 @@ set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 set(CMAKE_EXE_LINKER_FLAGS -static)
 
 add_executable(nsswitcher ${NSS})
+add_executable(linkRecursive src/linkRecursive.c)
+add_executable(prepareEnvDir src/prepareEnvDir.c)

@@ -37,9 +37,20 @@ module BDSL
       @type = "unknown"
       @extra_version = ""
       @buildDirectory = ""
+      @requireOnBuild = ""
+      @requireOnRun = ""
 
       instance_eval(io,filename,0)
     end
+
+    def out
+      pkgOut = "#{install_dir}/app.#{type}.#{name}-#{version}"
+      if extra_version != ""
+        pkgOut = pkgOut + "-#{extra_version}"
+      end
+      pkgOut
+    end
+
 
     def name(val = nil)
       @name = val unless val.nil?
@@ -57,6 +68,28 @@ module BDSL
     def version(val = nil)
       @version = val unless val.nil?
       @version
+    end
+
+    def requireOnBuild(val = nil)
+      unless val.nil?
+        if @requireOnBuild == ""
+          @requireOnBuild = val
+        else
+          @requireOnBuild = @requireOnBuild + " #{val}"
+        end
+      end
+      @requireOnBuild
+    end
+
+    def requireOnRun(val = nil)
+      unless val.nil?
+        if @requireOnRun == ""
+          @requireOnRun = val
+        else
+          @requireOnRun = @requireOnRun + " #{val}"
+        end
+      end
+      @requireOnRun
     end
 
     def extra_version(val = nil)
@@ -84,7 +117,7 @@ module BDSL
     end
 
     def do_build
-      @builder.build
+      @builder.do_build
     end
 
     def source_sha256(val)
@@ -148,5 +181,44 @@ module BDSL
     def tool_dir
       @config.get_tool_dir
     end
+
+    def checkBuildRequire
+      puts "require: build #{@requireOnBuild} run: #{@requireOnRun}"
+      @requireOnBuild.split(" ").each do |pname|
+        pkg = Pkg.load(@config,pname)
+      end
+    end
+
+    def prepareRunEnv
+      puts "out"
+    end
+
+    def prepareBuildEnv
+      checkBuildRequire
+
+      env = {}
+      envDir = "#{@config.get_install_dir}/envs/#{@self_sha}-#{@name}-#{version}-build"
+      env["SHARED_DIRS_RO"] = "/usr;/bin;/lib64"
+      env["SHARED_DIRS_RW"] = "#{@config.get_install_dir}"
+      env["ENV_DIR"] = envDir
+      env["BUILDING"] = "1"
+      env["EXEC"] = "#{@config.full_cmd}"
+      puts "#{env}"
+      err = system(env,"#{install_dir}/bin/prepareDir")
+
+      if (err != true)
+        raise "Error execution"
+      end
+
+      err = system(env,"#{install_dir}/bin/nsswitcher")
+
+      if (err != true)
+        raise "Error execution"
+      end
+
+
+    end
+
+
   end
 end

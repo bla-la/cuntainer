@@ -10,7 +10,13 @@
 #include <sys/resource.h>
 #include <sys/wait.h>
 #include <signal.h>
+#include <sys/types.h>
+#include <dirent.h>
 
+#include <cuntainer.h>
+
+
+char * envDir = NULL;
 const int defaultStackSize = 138240;
 
 struct sysLimits
@@ -75,16 +81,40 @@ int startChildProc(void *args)
 {
     int ret = 0;
     printf("child func\n");
+    envDir = getenv(ENV_DIR);
+    if(!envDir)
+    {
+	fprintf(stderr,"Error: env variable ENV_DIR not defined exit...");
+	exit(1);
+    }
 
+    ret =  setenv(ENV_NAME, envDir,1);
+
+
+    chroot(envDir);
     //    ret = unshare(CLONE_FS|CLONE_NEWNET);
     //   printf("ret: %d\n",ret);
 
     if (mount(NULL, "/", NULL, MS_PRIVATE|MS_REC, NULL) < 0) {
-	    printf("mount /");
-		}
-    char * params[] = {"busybox","sh",NULL};
+	printf("mount /");
+    }
 
-    execv("/opt/apps/build/busybox-1.22.1/busybox",params);
+    if (mount("proc", "/proc", "proc",MS_REC, NULL) < 0) {
+	perror("Mount error:");
+        printf("++++++mount /proc %d\n",errno);
+	exit(1);
+    }
+
+    if (mount("udev", "/dev", "devtmpfs",MS_REC, NULL) < 0) {
+	perror("Mount error:");
+        printf("++++++mount /dev %d\n",errno);
+	exit(1);
+    }
+
+
+    char * params[] = {"bash",NULL};
+
+    execv("/bin/bash",params);
 
 
     return 0;

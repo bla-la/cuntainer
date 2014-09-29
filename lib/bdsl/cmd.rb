@@ -6,12 +6,18 @@ module BDSL
     class Interaction
 
       def self.start(*cmd)
+        puts "CMD: #{$0}"
+        @fullCmd = File.expand_path("#{$0}")
+        cmd[0].each do |c|
+          @fullCmd = @fullCmd + " #{c}"
+        end
+        puts @fullCmd
         if cmd[0].nil?
           puts "Usage:"
           exit(1)
         end
         puts "#{cmd} #{cmd.length}"
-        init('test.yaml')
+        init('/opt/apps/etc/cuntainer.yml')
         case cmd[0][0]
           when "install"
           install(cmd)
@@ -28,13 +34,20 @@ module BDSL
       end
       #fetch/build/install
       def self.install(args)
+        @config.set_full_cmd(@fullCmd)
         pkg = Pkg.load(@config,args[0][1])
         puts "Try install #{args[0][1]} #{pkg.getVersion}"
 
         pkg.show_info
+        if ENV['BUILDING'].nil?
+          puts "Prepare build env"
+          pkg.prepareBuildEnv
+        else
+          puts "Start build env"
+          #pkg._preBuild
+          pkg.do_build
+        end
         p pkg.name
-        #pkg._preBuild
-        #pkg.do_build
       end
 
       def self.list(args)

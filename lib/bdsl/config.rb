@@ -6,6 +6,7 @@ module BDSL
   class Configuration
     puts 'Read configuraton...'
     def readConfig(path)
+      @full_cmd = ''
       begin
         cfg = YAML.load_file(path)
         @install_dir = cfg["install_dir"]
@@ -29,6 +30,14 @@ module BDSL
 
     def get_install_dir
       return @install_dir
+    end
+
+    def set_full_cmd(val)
+      @full_cmd = val
+    end
+
+    def full_cmd
+      @full_cmd
     end
 
     def get_tool_dir
