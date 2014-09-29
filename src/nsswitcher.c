@@ -16,6 +16,8 @@
 #include <cuntainer.h>
 
 
+
+
 char * envDir = NULL;
 const int defaultStackSize = 138240;
 
@@ -111,10 +113,16 @@ int startChildProc(void *args)
 	exit(1);
     }
 
+    char *envExec = getenv("EXEC");
+    if(!envExec)
+    {
+	fprintf(stderr,"Error: env variable EXEC not defined exit...");
+	exit(1);
+    }
 
-    char * params[] = {"bash",NULL};
+    char ** params = splitStringBy(envExec,' ',0);
 
-    execv("/bin/bash",params);
+    execv(params[0],params);
 
 
     return 0;

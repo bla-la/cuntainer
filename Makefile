@@ -38,22 +38,19 @@ RM = /usr/bin/cmake -E remove -f
 # Escaping for special characters.
 EQUALS = =
 
-# The program to use to edit the cache.
-CMAKE_EDIT_COMMAND = /usr/bin/ccmake
-
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /root/dev/cuntainer
+CMAKE_SOURCE_DIR = /root/cuntainer
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /root/dev/cuntainer
+CMAKE_BINARY_DIR = /root/cuntainer
 
 #=============================================================================
 # Targets provided globally by CMake.
 
 # Special rule for the target edit_cache
 edit_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
-	/usr/bin/ccmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running interactive CMake command-line interface..."
+	/usr/bin/cmake -i .
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -72,9 +69,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /root/dev/cuntainer/CMakeFiles /root/dev/cuntainer/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /root/cuntainer/CMakeFiles /root/cuntainer/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /root/dev/cuntainer/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /root/cuntainer/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -102,6 +99,19 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named cutils
+
+# Build rule for target.
+cutils: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 cutils
+.PHONY : cutils
+
+# fast build rule for target.
+cutils/fast:
+	$(MAKE) -f CMakeFiles/cutils.dir/build.make CMakeFiles/cutils.dir/build
+.PHONY : cutils/fast
+
+#=============================================================================
 # Target rules for targets named linkRecursive
 
 # Build rule for target.
@@ -113,6 +123,19 @@ linkRecursive: cmake_check_build_system
 linkRecursive/fast:
 	$(MAKE) -f CMakeFiles/linkRecursive.dir/build.make CMakeFiles/linkRecursive.dir/build
 .PHONY : linkRecursive/fast
+
+#=============================================================================
+# Target rules for targets named mounts
+
+# Build rule for target.
+mounts: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 mounts
+.PHONY : mounts
+
+# fast build rule for target.
+mounts/fast:
+	$(MAKE) -f CMakeFiles/mounts.dir/build.make CMakeFiles/mounts.dir/build
+.PHONY : mounts/fast
 
 #=============================================================================
 # Target rules for targets named nsswitcher
@@ -164,6 +187,30 @@ src/linkRecursive.c.s:
 	$(MAKE) -f CMakeFiles/linkRecursive.dir/build.make CMakeFiles/linkRecursive.dir/src/linkRecursive.c.s
 .PHONY : src/linkRecursive.c.s
 
+src/mounts.o: src/mounts.c.o
+.PHONY : src/mounts.o
+
+# target to build an object file
+src/mounts.c.o:
+	$(MAKE) -f CMakeFiles/mounts.dir/build.make CMakeFiles/mounts.dir/src/mounts.c.o
+.PHONY : src/mounts.c.o
+
+src/mounts.i: src/mounts.c.i
+.PHONY : src/mounts.i
+
+# target to preprocess a source file
+src/mounts.c.i:
+	$(MAKE) -f CMakeFiles/mounts.dir/build.make CMakeFiles/mounts.dir/src/mounts.c.i
+.PHONY : src/mounts.c.i
+
+src/mounts.s: src/mounts.c.s
+.PHONY : src/mounts.s
+
+# target to generate assembly for a file
+src/mounts.c.s:
+	$(MAKE) -f CMakeFiles/mounts.dir/build.make CMakeFiles/mounts.dir/src/mounts.c.s
+.PHONY : src/mounts.c.s
+
 src/nsswitcher.o: src/nsswitcher.c.o
 .PHONY : src/nsswitcher.o
 
@@ -212,26 +259,88 @@ src/prepareEnvDir.c.s:
 	$(MAKE) -f CMakeFiles/prepareEnvDir.dir/build.make CMakeFiles/prepareEnvDir.dir/src/prepareEnvDir.c.s
 .PHONY : src/prepareEnvDir.c.s
 
+src/utils.o: src/utils.c.o
+.PHONY : src/utils.o
+
+# target to build an object file
+src/utils.c.o:
+	$(MAKE) -f CMakeFiles/cutils.dir/build.make CMakeFiles/cutils.dir/src/utils.c.o
+	$(MAKE) -f CMakeFiles/mounts.dir/build.make CMakeFiles/mounts.dir/src/utils.c.o
+.PHONY : src/utils.c.o
+
+src/utils.i: src/utils.c.i
+.PHONY : src/utils.i
+
+# target to preprocess a source file
+src/utils.c.i:
+	$(MAKE) -f CMakeFiles/cutils.dir/build.make CMakeFiles/cutils.dir/src/utils.c.i
+	$(MAKE) -f CMakeFiles/mounts.dir/build.make CMakeFiles/mounts.dir/src/utils.c.i
+.PHONY : src/utils.c.i
+
+src/utils.s: src/utils.c.s
+.PHONY : src/utils.s
+
+# target to generate assembly for a file
+src/utils.c.s:
+	$(MAKE) -f CMakeFiles/cutils.dir/build.make CMakeFiles/cutils.dir/src/utils.c.s
+	$(MAKE) -f CMakeFiles/mounts.dir/build.make CMakeFiles/mounts.dir/src/utils.c.s
+.PHONY : src/utils.c.s
+
+src/utilsMount.o: src/utilsMount.c.o
+.PHONY : src/utilsMount.o
+
+# target to build an object file
+src/utilsMount.c.o:
+	$(MAKE) -f CMakeFiles/cutils.dir/build.make CMakeFiles/cutils.dir/src/utilsMount.c.o
+.PHONY : src/utilsMount.c.o
+
+src/utilsMount.i: src/utilsMount.c.i
+.PHONY : src/utilsMount.i
+
+# target to preprocess a source file
+src/utilsMount.c.i:
+	$(MAKE) -f CMakeFiles/cutils.dir/build.make CMakeFiles/cutils.dir/src/utilsMount.c.i
+.PHONY : src/utilsMount.c.i
+
+src/utilsMount.s: src/utilsMount.c.s
+.PHONY : src/utilsMount.s
+
+# target to generate assembly for a file
+src/utilsMount.c.s:
+	$(MAKE) -f CMakeFiles/cutils.dir/build.make CMakeFiles/cutils.dir/src/utilsMount.c.s
+.PHONY : src/utilsMount.c.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
+	@echo "... cutils"
 	@echo "... edit_cache"
 	@echo "... linkRecursive"
+	@echo "... mounts"
 	@echo "... nsswitcher"
 	@echo "... prepareEnvDir"
 	@echo "... rebuild_cache"
 	@echo "... src/linkRecursive.o"
 	@echo "... src/linkRecursive.i"
 	@echo "... src/linkRecursive.s"
+	@echo "... src/mounts.o"
+	@echo "... src/mounts.i"
+	@echo "... src/mounts.s"
 	@echo "... src/nsswitcher.o"
 	@echo "... src/nsswitcher.i"
 	@echo "... src/nsswitcher.s"
 	@echo "... src/prepareEnvDir.o"
 	@echo "... src/prepareEnvDir.i"
 	@echo "... src/prepareEnvDir.s"
+	@echo "... src/utils.o"
+	@echo "... src/utils.i"
+	@echo "... src/utils.s"
+	@echo "... src/utilsMount.o"
+	@echo "... src/utilsMount.i"
+	@echo "... src/utilsMount.s"
 .PHONY : help
 
 

@@ -1,5 +1,6 @@
 require 'net/http'
 require 'digest'
+require 'open3'
 require 'bdsl/builder'
 
 module BDSL
@@ -198,7 +199,7 @@ module BDSL
 
       env = {}
       envDir = "#{@config.get_install_dir}/envs/#{@self_sha}-#{@name}-#{version}-build"
-      env["SHARED_DIRS_RO"] = "/usr;/bin;/lib64"
+      env["SHARED_DIRS_RO"] = "/opt/ruby/v1_9_3_484/;/lib;/usr;/bin;/lib64"
       env["SHARED_DIRS_RW"] = "#{@config.get_install_dir}"
       env["ENV_DIR"] = envDir
       env["BUILDING"] = "1"
@@ -214,6 +215,21 @@ module BDSL
 
       if (err != true)
         raise "Error execution"
+      end
+
+      mountOutput = ''
+      status = Open3.popen3(ENV,"#{install_dir}/bin/mounts") {|sin,sout,serr,wait_thr|
+        sin.close
+        mountOutput = sout.read
+      }
+      mountOutput.split("\n").each do |mountPoint|
+        if mountPoint.include? envDir
+          #puts "mount point:"+mountPoint.split(' ')[1]
+          status = Open3.popen3(ENV,"#{install_dir}/bin/mounts -u"+mountPoint.split(' ')[1]) {|sin,sout,serr,wait_thr|
+            sin.close
+          }
+
+        end
       end
 
 

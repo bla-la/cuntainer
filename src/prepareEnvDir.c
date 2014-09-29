@@ -14,62 +14,6 @@ char * sharedDirsRo = NULL;
 char * sharedDirsRw = NULL;
 char * envDir = NULL;
 
-char **
-splitStringBy(char * dir,char sep,int withLast)
-{
-    char * p  = dir;
-    char *st = dir;
-    int arr_len = 0;
-    int arr_cur_len = 10;
-    int len;
-    char ** ptrs = (char **) malloc(sizeof(char *) * arr_cur_len);
-
-    printf("directory for split %s\n",dir);
-    while( *p )
-    {
-	if(*p == sep)
-	{
-	    len = p - st;
-	    //printf("len %d");
-	    ptrs[arr_len] = malloc(len + 2);
-	    memcpy(ptrs[arr_len],st,len + 1);
-	    if(withLast)
-	    {
-		ptrs[arr_len][len+1] = 0;
-	    }
-	    else
-	    {
-		ptrs[arr_len][len] = 0;
-		st = p + 1;
-
-	    }
-	    arr_len++;
-	    if(arr_len == arr_cur_len -1)
-	    {
-		ptrs = realloc(ptrs,sizeof(char *) * (arr_cur_len * 2));
-		arr_cur_len = arr_cur_len * 2;
-	    }
-	}
-	p++;
-    }
-    len = p - st;
-    ptrs[arr_len] = malloc(len + 2);
-    memcpy(ptrs[arr_len],st,len+1);
-    if(withLast)
-    {
-	ptrs[arr_len][len+1] = 0;
-    }
-    else
-    {
-	ptrs[arr_len][len] = 0;
-    }
-
-    //ptrs[arr_len][len+2] = 0;
-    arr_len++;
-
-    ptrs[arr_len] = NULL;
-    return ptrs;
-}
 
 char **
 splitDirectory(char *dir)
