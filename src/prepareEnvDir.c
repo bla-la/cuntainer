@@ -15,44 +15,6 @@ char * sharedDirsRw = NULL;
 char * envDir = NULL;
 
 
-char **
-splitDirectory(char *dir)
-{
-    return splitStringBy(dir,'/',1);
-}
-
-
-void
-checkDirectory(char * dir)
-{
-    char ** dirs = splitDirectory(dir);
-    int i = 0;
-    int ret;
-    while(dirs[i])
-    {
-	//printf("dir: %s\n",dirs[i]);
-
-	DIR* d = opendir(dirs[i]);
-	if(d)
-	{
-	    closedir(d);
-	}else
-	{
-	    //	    printf("directory %s not exists, createing.\n",dirs[i]);
-	    ret = mkdir(dirs[i],0777);
-	    if(ret < 0)
-	    {
-		perror("MKdir:");
-		exit(1);
-	    }
-	}
-
-	free(dirs[i]);
-	i++;
-    }
-
-    free(dirs);
-}
 
 
 void

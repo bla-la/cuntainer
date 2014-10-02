@@ -8,6 +8,7 @@ buildDirectory 'build'
 requireOnBuild 'binutils/binutils-2.24-bootstrap_p1'
 requireOnRun 'binutils/binutils-2.24-bootstrap_p1'
 #requireOnRun 'bar'
+addPath '/tool/bin/'
 
 bootstrap 1
 
@@ -21,7 +22,7 @@ build do
     #    "
 
   def  configArgs
-    "--prefix=#{out} --target=x86_64-unknown-linux-gnu
+    "--prefix=#{tool_dir} --target=x86_64-linux-gnu
   --with-newlib --without-headers
   --with-local-prefix=/tools
   --disable-nls --disable-shared --disable-multilib --disable-decimal-float

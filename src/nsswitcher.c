@@ -120,10 +120,22 @@ int startChildProc(void *args)
 	exit(1);
     }
 
-    char ** params = splitStringBy(envExec,' ',0);
+    char * goToEnv = getenv("GO_TO_ENV");
+    if(goToEnv)
+    {
+	fprintf(stderr,"=====-----try exec /bin/bash");
+	char *pp[] = {"/bin/bash",NULL};
+	execv(pp[0],pp);
+	perror("error: ");
+    }else
+    {
 
-    execv(params[0],params);
+	printf("----try exec: %s\n",envExec);
+	char ** params = splitStringBy(envExec,' ',0);
 
+
+	execv(params[0],params);
+    }
 
     return 0;
 }

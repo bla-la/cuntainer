@@ -7,6 +7,7 @@ module BDSL
 
       def self.start(*cmd)
         puts "CMD: #{$0}"
+        @goToEnv = nil
         @fullCmd = File.expand_path("#{$0}")
         cmd[0].each do |c|
           @fullCmd = @fullCmd + " #{c}"
@@ -20,6 +21,10 @@ module BDSL
         init('/opt/apps/etc/cuntainer.yml')
         case cmd[0][0]
           when "install"
+          install(cmd)
+          when "env"
+          puts "set env"
+          @goToEnv = "1"
           install(cmd)
           when "list"
           list(cmd)
@@ -35,6 +40,11 @@ module BDSL
       #fetch/build/install
       def self.install(args)
         @config.set_full_cmd(@fullCmd)
+        unless @goToEnv.nil?
+          @config.goToEnv("go")
+          puts "set config gotoenv"
+
+        end
         pkg = Pkg.load(@config,args[0][1])
         puts "Try install #{args[0][1]} #{pkg.getVersion}"
 

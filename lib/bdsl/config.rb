@@ -21,7 +21,13 @@ module BDSL
       @sources_dir = "#{@install_dir}/sources" unless !@sources_dir.nil?
 
       @pkg_dir = File.expand_path(@pkg_dir)
+      @goToEnv = nil
+    end
 
+    def goToEnv(val = nil)
+      @goToEnv = val unless val.nil?
+      puts "===ZZZ=== now @goToEnv #{val} #{@goToEnv}"
+      @goToEnv
     end
 
     def initialize(path)

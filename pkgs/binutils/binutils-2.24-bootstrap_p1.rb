@@ -11,7 +11,7 @@ build do
     #    export
     #    "
 
-    configPhase "./configure --prefix=#{tool_dir} --with-lib-path=/tools/lib --disable-nls --disable-werror"
+    configPhase "./configure --prefix=#{tool_dir} --target=x86_64-linux-gnu --with-lib-path=/tools/lib --disable-nls --disable-werror"
     buildPhase "make -j4"
     installPhase "make DESTDIR=#{out} install"
 end

@@ -45,6 +45,7 @@ void makeStringFromSting(char **dst,char *src,size_t len);
 char ** splitStringBy(char * dir,char sep,int withLast);
 struct list * getMounts();
 int readFile(const char *path,char **outBuf,size_t *size,size_t forceSize);
-
+char ** splitDirectory(char *dir);
+void checkDirectory(char * dir);
 
 #endif

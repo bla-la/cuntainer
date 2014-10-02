@@ -1,4 +1,6 @@
 require 'bdsl/pkg'
+require 'json'
+require 'open3'
 require 'fileutils'
 
 module BDSL
@@ -11,6 +13,7 @@ module BDSL
       @source_pkg = @pkg.get_source_path
       @buildDir = "#{@pkg.build_dir}/#{@pkg.name}-#{@pkg.version}"
       @buildBlock = block
+      @pkgMetaFile = "#{@pkg.out}/.mdat/pkg"
 
     end
 
@@ -18,10 +21,49 @@ module BDSL
       @pkg.out
     end
 
+    def _postBuild
+      pkgReqOnRun = []
+      @pkg.requireOnRun.split.each do |reqPkg|
+        pkgReqOnRun.push(reqPkg)
+      end
+      pkgHash = {:name => @pkg.name,
+        :version => @pkg.getVersion,
+        :extra_version => @pkg.extra_version,
+        :pkg_rule_sha => @pkg.sha,
+        :pkg_sha => "ds",
+        :run_require => pkgReqOnRun
+      }
+
+      until File.directory?("#{@pkg.out}/.mdat")
+        Dir.mkdir("#{@pkg.out}/.mdat")
+      end
+
+      File.open(@pkgMetaFile, File::RDWR|File::CREAT, 0644) {|f|
+        f.truncate(0)
+        f.write("#{pkgHash.to_json}")
+      }
+    end
+
+    def needBuild
+      if File.directory?("#{@pkg.out}/.mdat")
+        puts " directory exists: #{@pkg.out}"
+        pkgJson = ''
+        File.open(@pkgMetaFile, File::RDONLY, 0644) {|f|
+          pkgJson = f.read()
+        }
+
+        puts "pkg json #{pkgJson}"
+        return false
+      end
+      return true
+    end
 
     def do_build
-      _preBuild
-      instance_eval(&@buildBlock)
+      if needBuild
+        _preBuild
+        instance_eval(&@buildBlock)
+        _postBuild
+      end
     end
 
     def tool_dir
@@ -51,10 +93,16 @@ module BDSL
 
     def exec(val)
       Dir.chdir "#{@buildDir}/#{@pkg.name}-#{@pkg.version}"
-      err = system("#{@pkg.pkg_dir}/#{val}")
-      if (err != true)
-        raise "Error execution #{val}"
-      end
+      puts "PKG dir #{@pkg.pkg_dir}"
+      File.chmod(600,"#{@pkg.pkg_dir}/#{val}")
+      status = Open3.popen3(ENV,"#{@pkg.pkg_dir}/#{val}") {|sin,sout,serr,wait_thr|
+        sin.close
+        puts = serr.read
+      }
+#err = system("#{@pkg.pkg_dir}/#{val}")
+#      if (err != true)
+#        raise "Error execution #{val} #{err}"
+#      end
 
     end
 
@@ -83,7 +131,8 @@ module BDSL
         Dir.chdir "#{@pkg.buildDirectory}"
       end
 
-      err = system(val)
+      ENV["PATH"] = "/tools/bin:/bin:/usr/bin"
+      err = system(ENV,val)
       if (err != true)
         raise "Error execution #{val}"
       end

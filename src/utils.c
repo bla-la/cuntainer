@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <dirent.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -23,6 +24,16 @@ void makeStringFromSting(char **dst,char *src,size_t len)
 
 }
 
+
+void
+freeCharPtrArray(char ** array)
+{
+    int i = 0;
+    while(array[i])
+	free(array[i]);
+
+    free(array);
+}
 
 char **
 splitStringBy(char * dir,char sep,int withLast)
@@ -159,4 +170,45 @@ freeList(struct list *list,void (*deepFree)(void *))
 	free(list);
 	list = tmp;
     }
+}
+
+
+
+char **
+splitDirectory(char *dir)
+{
+    return splitStringBy(dir,'/',1);
+}
+
+
+void
+checkDirectory(char * dir)
+{
+    char ** dirs = splitDirectory(dir);
+    int i = 0;
+    int ret;
+    while(dirs[i])
+    {
+	//printf("dir: %s\n",dirs[i]);
+
+	DIR* d = opendir(dirs[i]);
+	if(d)
+	{
+	    closedir(d);
+	}else
+	{
+	    //	    printf("directory %s not exists, createing.\n",dirs[i]);
+	    ret = mkdir(dirs[i],0777);
+	    if(ret < 0)
+	    {
+		perror("MKdir:");
+		exit(1);
+	    }
+	}
+
+	free(dirs[i]);
+	i++;
+    }
+
+    free(dirs);
 }

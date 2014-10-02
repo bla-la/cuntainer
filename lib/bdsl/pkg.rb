@@ -13,7 +13,6 @@ module BDSL
     def self.load(config,filename)
       config
       #TODO search on subdirectory
-      @pkg_dir = File.dirname("#{config.get_pkg_dir}/#{filename}.rb")
       evalFilePath = "#{config.get_pkg_dir}/#{filename}.rb"
 
       begin
@@ -40,7 +39,9 @@ module BDSL
       @buildDirectory = ""
       @requireOnBuild = ""
       @requireOnRun = ""
-
+      @pkg_dir = File.dirname("#{@config.get_pkg_dir}/#{filename}.rb")
+      @startEnv = ENV["PATH"]
+      ENV["ORIGINAL_PATH"] = @startEnv
       instance_eval(io,filename,0)
     end
 
@@ -80,6 +81,17 @@ module BDSL
         end
       end
       @requireOnBuild
+    end
+
+
+    def addPath(val)
+      oldPath = ENV["PATH"]
+      newPath = "#{val}"
+      oldPath.split(':').each do |dir|
+        newPath = newPath + ':'+dir
+      end
+
+      ENV["PATH"] = newPath
     end
 
     def requireOnRun(val = nil)
@@ -187,6 +199,7 @@ module BDSL
       puts "require: build #{@requireOnBuild} run: #{@requireOnRun}"
       @requireOnBuild.split(" ").each do |pname|
         pkg = Pkg.load(@config,pname)
+        pkg.do_build
       end
     end
 
@@ -199,7 +212,7 @@ module BDSL
 
       env = {}
       envDir = "#{@config.get_install_dir}/envs/#{@self_sha}-#{@name}-#{version}-build"
-      env["SHARED_DIRS_RO"] = "/opt/ruby/v1_9_3_484/;/lib;/usr;/bin;/lib64"
+      env["SHARED_DIRS_RO"] = "/opt/ruby/v1_9_3_484/;/etc;/lib;/usr;/bin;/lib64"
       env["SHARED_DIRS_RW"] = "#{@config.get_install_dir}"
       env["ENV_DIR"] = envDir
       env["BUILDING"] = "1"
@@ -211,11 +224,18 @@ module BDSL
         raise "Error execution"
       end
 
+      unless @config.goToEnv().nil?
+        puts "===ZZZ===set GO_TO_ENV env variable"
+        env["GO_TO_ENV"] = "1"
+      end
+      puts "===ZZZ=== @config.goToEnv().nil? #{@config.goToEnv().nil?}"
       err = system(env,"#{install_dir}/bin/nsswitcher")
 
       if (err != true)
         raise "Error execution"
       end
+
+      ENV["PATH"] = @startEnv
 
       mountOutput = ''
       status = Open3.popen3(ENV,"#{install_dir}/bin/mounts") {|sin,sout,serr,wait_thr|
